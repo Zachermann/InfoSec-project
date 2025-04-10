@@ -1,1 +1,1 @@
-A basic PHP + SQLite login system with intentional SQL injection vulnerabilities
+A login page and database for information security that is vulnerable to SQL injection 
