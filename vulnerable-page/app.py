@@ -7,9 +7,9 @@ DB_NAME = 'sandmannDB.sqlite'
 
 # Initialize the DB and add test users
 def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('''
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
@@ -24,11 +24,11 @@ def init_db():
     ]
     for user in sample_users:
         try:
-            c.execute("INSERT INTO users (username, password) VALUES (?, ?)", user)
+            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", user)
         except:
             continue
-    conn.commit()
-    conn.close()
+    connection.commit()
+    connection.close()
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -37,16 +37,16 @@ def register():
         password = request.form['password']
         hashed_pw = hashlib.sha256(password.encode()).hexdigest()
         
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
+        connection = sqlite3.connect(DB_NAME)
+        cursor = connection.cursor()
         try:
             # Vulnerable INSERT using f-string
-            c.execute(f"INSERT INTO users (username, password) VALUES ('{username}', '{hashed_pw}')")
-            conn.commit()
+            cursor.execute(f"INSERT INTO users (username, password) VALUES ('{username}', '{hashed_pw}')")
+            connection.commit()
             message = "Registration successful."
         except sqlite3.IntegrityError:
             message = "Username already exists."
-        conn.close()
+        connection.close()
         return message + ' <a href="/login">Login</a>'
     
     return render_template('register.html')
@@ -58,14 +58,14 @@ def login():
         password = request.form['password']
         hashed_pw = hashlib.sha256(password.encode()).hexdigest()
 
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
+        connection = sqlite3.connect(DB_NAME)
+        cursor = connection.cursor()
         #VULNERABLE login query
         query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{hashed_pw}'"
         print("Executing query:", query)  # For debugging
-        c.execute(query)
+        cursor.execute(query)
         result = c.fetchone()
-        conn.close()
+        connection.close()
 
         if result:
             return f"Welcome, {username}!"
