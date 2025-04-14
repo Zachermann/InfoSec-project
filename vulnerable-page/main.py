@@ -1,7 +1,7 @@
 import sqlite3
 
 # create empty database
-connection = sqlite3.connect("Sandmann.db")
+connection = sqlite3.connect("SandmannDB.db")
 # communicate with the database
 cursor = connection.cursor()
 
